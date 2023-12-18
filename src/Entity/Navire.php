@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\NavireRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -54,6 +56,14 @@ class Navire {
     #[ORM\ManyToOne(inversedBy: 'navires',cascade:['persist'])]
     #[ORm\JoinColumn(name: 'idport', referencedColumnName: 'id',nullable: true)]
     private ?Port $idport = null;
+
+    #[ORM\OneToMany(mappedBy: 'historiqueNavire', targetEntity: Escale::class, orphanRemoval: true)]
+    private Collection $escales;
+
+    public function __construct()
+    {
+        $this->escales = new ArrayCollection();
+    }
 
     public function getId(): ?int {
         return $this->id;
@@ -167,6 +177,36 @@ class Navire {
     public function setIdport(?Port $idport): static
     {
         $this->idport = $idport;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Escale>
+     */
+    public function getEscales(): Collection
+    {
+        return $this->escales;
+    }
+
+    public function addEscale(Escale $escale): static
+    {
+        if (!$this->escales->contains($escale)) {
+            $this->escales->add($escale);
+            $escale->setHistoriqueNavire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEscale(Escale $escale): static
+    {
+        if ($this->escales->removeElement($escale)) {
+            // set the owning side to null (unless already changed)
+            if ($escale->getHistoriqueNavire() === $this) {
+                $escale->setHistoriqueNavire(null);
+            }
+        }
 
         return $this;
     }

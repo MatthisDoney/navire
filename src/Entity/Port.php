@@ -36,10 +36,14 @@ class Port
     #[ORM\OneToMany(mappedBy: 'destination', targetEntity: Navire::class)]
     private Collection $navires;
 
+    #[ORM\OneToMany(mappedBy: 'historiquePort', targetEntity: Escale::class, orphanRemoval: true)]
+    private Collection $escales;
+
     public function __construct()
     {
         $this->types = new ArrayCollection();
         $this->navires = new ArrayCollection();
+        $this->escales = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -130,6 +134,36 @@ class Port
             // set the owning side to null (unless already changed)
             if ($navire->getIdport() === $this) {
                 $navire->setIdport(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Escale>
+     */
+    public function getEscales(): Collection
+    {
+        return $this->escales;
+    }
+
+    public function addEscale(Escale $escale): static
+    {
+        if (!$this->escales->contains($escale)) {
+            $this->escales->add($escale);
+            $escale->setHistoriquePort($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEscale(Escale $escale): static
+    {
+        if ($this->escales->removeElement($escale)) {
+            // set the owning side to null (unless already changed)
+            if ($escale->getHistoriquePort() === $this) {
+                $escale->setHistoriquePort(null);
             }
         }
 
