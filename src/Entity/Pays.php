@@ -28,9 +28,13 @@ class Pays
     #[ORM\OneToMany(mappedBy: 'pavillon', targetEntity: Navire::class)]
     private Collection $navires;
 
+    #[ORM\OneToMany(mappedBy: 'idpays', targetEntity: Port::class)]
+    private Collection $ports;
+
     public function __construct()
     {
         $this->navires = new ArrayCollection();
+        $this->ports = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,6 +90,36 @@ class Pays
             // set the owning side to null (unless already changed)
             if ($navire->getPavillon() === $this) {
                 $navire->setPavillon(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Port>
+     */
+    public function getPorts(): Collection
+    {
+        return $this->ports;
+    }
+
+    public function addPort(Port $port): static
+    {
+        if (!$this->ports->contains($port)) {
+            $this->ports->add($port);
+            $port->setIdpays($this);
+        }
+
+        return $this;
+    }
+
+    public function removePort(Port $port): static
+    {
+        if ($this->ports->removeElement($port)) {
+            // set the owning side to null (unless already changed)
+            if ($port->getIdpays() === $this) {
+                $port->setIdpays(null);
             }
         }
 
