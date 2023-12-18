@@ -51,6 +51,10 @@ class Navire {
     #[ORM\JoinColum(name: 'idpays', referencedColumnName: 'id', nullable: false)]
     private ?Pays $pavillon = null;
 
+    #[ORM\ManyToOne(inversedBy: 'navires',cascade:['persist'])]
+    #[ORm\JoinColumn(name: 'idport', referencedColumnName: 'id',nullable: true)]
+    private ?Port $idport = null;
+
     public function getId(): ?int {
         return $this->id;
     }
@@ -151,6 +155,18 @@ class Navire {
 
     public function setPavillon(?Pays $pavillon): static {
         $this->pavillon = $pavillon;
+
+        return $this;
+    }
+
+    public function getIdport(): ?Port
+    {
+        return $this->idport;
+    }
+
+    public function setIdport(?Port $idport): static
+    {
+        $this->idport = $idport;
 
         return $this;
     }
