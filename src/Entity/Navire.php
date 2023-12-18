@@ -9,13 +9,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: NavireRepository::class)]
 class Navire
 {
+    #[Assert\Unique(fields:['imo','mmsi','indicatifAppel'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column (name:'id')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 7)]
-    #[Assert\Regex]
+    #[ORM\Column(name:'imo', length: 7)]
+    #[Assert\Regex('[1-9][0-9]{6}',message:'le numéro IMO doit être unique et composé de 7 chiffres sans commencer par 0')]
     private ?string $IMO = null;
 
     #[ORM\Column(length: 255)]
@@ -24,11 +25,24 @@ class Navire
     #[ORM\Column(length: 9)]
     private ?string $MMSI = null;
 
-    #[ORM\Column(length: 10)]
+    #[ORM\Column(name:'indicatifappel',length: 10)]
     private ?string $IndicatifDappel = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $Eta = null;
+
+    #[ORM\ManyToOne(inversedBy: 'navires')]
+    #[ORM\JoinColumn(name:'idaisshiptype',referencedColumnName:'id',nullable: false)]
+    private ?AisShipType $aisShipType = null;
+
+    #[ORM\Column]
+    private ?int $longueur = null;
+
+    #[ORM\Column]
+    private ?int $largeur = null;
+
+    #[ORM\Column]
+    private ?float $tirantdeau = null;
 
     public function getId(): ?int
     {
@@ -91,6 +105,54 @@ class Navire
     public function setEta(\DateTimeInterface $Eta): static
     {
         $this->Eta = $Eta;
+
+        return $this;
+    }
+
+    public function getAisShipType(): ?AisShipType
+    {
+        return $this->aisShipType;
+    }
+
+    public function setAisShipType(?AisShipType $aisShipType): static
+    {
+        $this->aisShipType = $aisShipType;
+
+        return $this;
+    }
+
+    public function getLongueur(): ?int
+    {
+        return $this->longueur;
+    }
+
+    public function setLongueur(int $longueur): static
+    {
+        $this->longueur = $longueur;
+
+        return $this;
+    }
+
+    public function getLargeur(): ?int
+    {
+        return $this->largeur;
+    }
+
+    public function setLargeur(int $largeur): static
+    {
+        $this->largeur = $largeur;
+
+        return $this;
+    }
+
+    public function getTirantdeau(): ?float
+    {
+        return $this->tirantdeau;
+    }
+
+    public function setTirantdeau(float $tirantdeau): static
+    {
+        $this->tirantdeau = $tirantdeau;
 
         return $this;
     }
