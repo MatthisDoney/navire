@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PortRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PortRepository::class)]
@@ -21,6 +23,16 @@ class Port
     #[ORM\Column(name:'indicatif', length: 5)]
     #[ORM\Regex(pattern:"/[A-Z]{5}/", message:"L'indicatif Port a stritement 5 caractères")]
     private ?string $Indicatif = null;
+
+    #[ORM\ManyToMany(targetEntity: AisShipType::class, inversedBy: 'portsCompatibles')]
+    #[ORM\JoinTable(name:'porttypecompatible')]
+    #[ORM\JoinColumn(name:'idport', referencedColumnName:'id')]
+    private Collection $types;
+
+    public function __construct()
+    {
+        $this->types = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -47,6 +59,30 @@ class Port
     public function setIndicatif(string $Indicatif): static
     {
         $this->Indicatif = $Indicatif;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AisShipType>
+     */
+    public function getTypes(): Collection
+    {
+        return $this->types;
+    }
+
+    public function addType(AisShipType $type): static
+    {
+        if (!$this->types->contains($type)) {
+            $this->types->add($type);
+        }
+
+        return $this;
+    }
+
+    public function removeType(AisShipType $type): static
+    {
+        $this->types->removeElement($type);
 
         return $this;
     }
